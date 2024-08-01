@@ -10,6 +10,7 @@ route = APIRouter(prefix="/admin", tags=['Admin'])
 
 @route.get("/", response_model=List[ResponseUsers], status_code=status.HTTP_200_OK)
 def view_users(db: Session = Depends(get_by), current_user: User= Depends(get_current_user) ):
+    
     user = db.query(User).filter(User.id == current_user.id).first()
     
     if not user:

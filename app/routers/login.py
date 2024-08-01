@@ -18,10 +18,10 @@ def login(user:Post_login, db:Session= Depends(get_by)):
         new_user = db.query(User).outerjoin(role_users, User.id == role_users.c.user_id).filter(
         User.email == user.email).first()
         if not new_user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="wrong credentilas!")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found!")
         
         if not verifypassword(user.password,new_user.password):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="wrong credentilas!")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="wrong credentials!")
         
         roles = [role.role_name for role in new_user.roles]
         
