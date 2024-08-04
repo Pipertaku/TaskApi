@@ -3,7 +3,7 @@ from .routers import task, users,login,admin
 from fastapi.middleware.cors import CORSMiddleware
 
 
-origins = ["*"]
+origins = ["http://localhost:3000"]
 
 app = FastAPI()
 

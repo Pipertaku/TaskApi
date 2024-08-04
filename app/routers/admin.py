@@ -40,7 +40,7 @@ def view_users(db: Session = Depends(get_by), current_user: User= Depends(get_cu
     return users
 
 
-@route.delete("/{id}", status_code=status.HTTP_200_OK)
+@route.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(id: int, db: Session = Depends(get_by), current_user: User = Depends(get_current_user)):
     # Verify the current user is an admin
     if not any(role.role_name == "admin" for role in current_user.roles):

@@ -1,4 +1,4 @@
-from .database import session,client
+
 from app.schemes.users_scheme import ResponseUsers
 
 def test_userresponse(client):
