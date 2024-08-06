@@ -1,15 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List
 from ..database_connection import get_by
 from ..models import User
-from ..schemes.users_scheme import ResponseUsers
+from ..schemes.users_scheme import ResponseUsers, Response_Users
 from ..aouth2 import get_current_user
 
 route = APIRouter(prefix="/admin", tags=['Admin'])
 
-@route.get("/", response_model=List[ResponseUsers], status_code=status.HTTP_200_OK)
-def view_users(db: Session = Depends(get_by), current_user: User= Depends(get_current_user) ):
+@route.get("/", response_model=Response_Users, status_code=status.HTTP_200_OK)
+def view_users(db: Session = Depends(get_by), current_user: User= Depends(get_current_user),
+               limit:int=Query(2, gt=0),
+               page: int =Query(1,gt =0)):
+    offset= (page-1)* limit
+    
     
     user = db.query(User).filter(User.id == current_user.id).first()
     
@@ -21,7 +25,11 @@ def view_users(db: Session = Depends(get_by), current_user: User= Depends(get_cu
         
 
     # Fetch all users
-    users_query = db.query(User).all()
+    users_query = db.query(User).offset(offset).limit(limit).all()
+    total_users = db.query(User).count()
+    tota_pages = ((total_users+ limit)-1)//2
+    
+    
     
     # Serialize users using Pydantic model
     
@@ -37,11 +45,16 @@ def view_users(db: Session = Depends(get_by), current_user: User= Depends(get_cu
         }
         users.append(ResponseUsers(**user_dict))
     
-    return users
+    return {
+        "users":users,
+        "total_pages":tota_pages,
+        "current_page": page,
+    }
 
 
 @route.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(id: int, db: Session = Depends(get_by), current_user: User = Depends(get_current_user)):
+def delete_user(id: int, db: Session = Depends(get_by), current_user: User = Depends(get_current_user),
+                ):
     # Verify the current user is an admin
     if not any(role.role_name == "admin" for role in current_user.roles):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not allowed")

@@ -14,6 +14,11 @@ class ResponseUsers(BaseModel):
     firstname: str
     email: EmailStr
     roles: list[str]
+    
+class Response_Users(BaseModel):
+    users: List[ResponseUsers]
+    total_pages:int
+    current_page:int
 
     class Config:
         from_orm = True
