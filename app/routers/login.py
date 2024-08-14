@@ -16,7 +16,7 @@ def login(user:Post_login, db:Session= Depends(get_by)):
     
         
         new_user = db.query(User).outerjoin(role_users, User.id == role_users.c.user_id).filter(
-        User.email == user.email).first()
+        User.email == user.email , User.firstname == user.firstname).first()
         if not new_user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found!")
         
